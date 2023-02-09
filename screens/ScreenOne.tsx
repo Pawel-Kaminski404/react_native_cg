@@ -2,6 +2,9 @@ import * as React from "react"
 import { useState } from "react";
 import { StyleSheet, View, Text, TextInput, Button, FlatList } from "react-native"
 import ToDoListItem from "../components/ToDoListItem";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 
 
 const WelcomeScreen = () => {
@@ -9,15 +12,53 @@ const WelcomeScreen = () => {
     const [toDoList, setToDoList] = useState<ToDoItem[]>([]);
     const [isErrorVisible, setIsErrorVisible] = useState<Boolean>(false);
     const [toDoListIndex, setToDoListIndex] = useState<number>(0);
+    const [storedData, setStoredData] = useState<string>("");
+
+    const storeData = async () => {
+        try {
+          const jsonValue = JSON.stringify(toDoList)
+          await AsyncStorage.setItem('@storage_Key', jsonValue)
+        } catch (e) {
+          // saving error
+        }
+      }
+    
+    // const getData = async () => {
+    // try {
+    //     const value = await AsyncStorage.getItem('@storage_Key')
+    //     if(value !== null) {
+    //     // value previously stored
+    //         setToDoList(value);
+    //     }
+    // } catch(e) {
+    //     // error reading value
+    // }
+    // }
+
+    
+const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@storage_Key')
+      if (jsonValue != null) {
+        setToDoList(JSON.parse(jsonValue));
+      }
+    //   return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch(e) {
+      // error reading value
+    }
+  }
 
     const getNewIndex = (): number => {
-        setToDoListIndex(toDoListIndex + 1)
-        return toDoListIndex
+        var num = Math.floor(Math.random() * 100000);
+        setToDoListIndex(num);
+        return num;
     }
 
     const addTask = (): void => {
-        if (inputTextValue.trim())
+        if (inputTextValue.trim()) {
             setToDoList([...toDoList, { task: inputTextValue, done: false, id: getNewIndex() }]);
+            // storeData();
+        }
         else setIsErrorVisible(true);
             setInputTextValue("");
       };
@@ -25,6 +66,7 @@ const WelcomeScreen = () => {
     const removeItem = (index: number): void => {
         const newToDoList = toDoList.filter(item => item.id != index)
         setToDoList(newToDoList);
+        storeData();
     };
 
     const toggleDone = (index: number): void => {
@@ -35,6 +77,7 @@ const WelcomeScreen = () => {
             }
         })
         setToDoList(newToDoList);
+        storeData();
     };
 
     const renderItem = (toDoItem: ToDoItem) => <ToDoListItem 
@@ -58,6 +101,7 @@ const WelcomeScreen = () => {
                 style={styles.inputBox}
             />
             <Button title="Add Task" onPress={addTask} />
+            
             </View>
             {isErrorVisible && (
                 <Text style={styles.error}>Error: Input field is empty...</Text>
@@ -65,6 +109,9 @@ const WelcomeScreen = () => {
             <Text style={styles.subtitle}>Tasks:</Text>
             {toDoList.length === 0 && <Text>No tasks.</Text>}
             <View style={styles.toDoList}>
+            <Text>Data: {storedData}</Text>
+            <Button title="save" onPress={storeData} />
+            <Button title="read" onPress={getData} />
                 <FlatList 
                     ListHeaderComponent={<></>}
                     data={toDoList} renderItem= {({item}) => renderItem(item)}
