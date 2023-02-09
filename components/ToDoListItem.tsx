@@ -1,11 +1,5 @@
 import { View, Text, Button } from "react-native";
 
-interface ToDoItem {
-    id: number;
-    task: string;
-    done: boolean;
-}
-
 export default function ToDoListItem({ toDoItem, toggleComplete, removeItem, styles }: 
     {   
         toDoItem: ToDoItem, 

@@ -1,13 +1,7 @@
 import * as React from "react"
 import { useState } from "react";
-import { StyleSheet, View, Text, TextInput, Pressable, Button, FlatList, ScrollView } from "react-native"
+import { StyleSheet, View, Text, TextInput, Button, FlatList } from "react-native"
 import ToDoListItem from "../components/ToDoListItem";
-
-interface ToDoItem {
-    id: number;
-    task: string;
-    done: boolean;
-}
 
 
 const WelcomeScreen = () => {
@@ -15,7 +9,6 @@ const WelcomeScreen = () => {
     const [toDoList, setToDoList] = useState<ToDoItem[]>([]);
     const [isErrorVisible, setIsErrorVisible] = useState<Boolean>(false);
     const [toDoListIndex, setToDoListIndex] = useState<number>(0);
-
 
     const getNewIndex = (): number => {
         setToDoListIndex(toDoListIndex + 1)
