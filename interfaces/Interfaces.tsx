@@ -4,8 +4,13 @@ interface ToDoItem {
     done: boolean;
 }
 
-interface SwapiPersonItem {
+interface SwapiItem {
     id: string | number[];
+    name: string;
+    url: string,
+}
+
+interface SwapiPersonItem {
     name: string;
     gender: string;
     height: string;
@@ -14,6 +19,16 @@ interface SwapiPersonItem {
     eye_color: string;
     skin_color: string;
     hair_color: string;
-    urlNext: string;
-    urlPrevious: string;
+}
+
+interface SwapiPlanetItem {
+    name: string;
+    rotation_period: string;
+    orbital_period: string;
+    diameter: string;
+    climate: string;
+    gravity: string;
+    terrain: string;
+    surface_water: string;
+    population: string;
 }

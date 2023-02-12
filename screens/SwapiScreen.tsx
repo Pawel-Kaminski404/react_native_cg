@@ -6,29 +6,38 @@ import uuid from 'react-native-uuid';
 
 const SwapiScreen = () => {
     const [isLoading, setIsLoading] = useState(true);
+    const [isModalLoading, setIsModalLoading] = useState(true);
     const [error, setError] = useState();
     const [response, setResponse] = useState();
-    const [swapiList, setSwapiList] = useState<SwapiPersonItem[]>([]);
+    const [itemResponse, setItemResponse] = useState();
+    const [swapiList, setSwapiList] = useState<SwapiItem[]>([]);
     const [urlNext, setUrlNext] = useState("")
     const [urlPrevious, setUrlPrevious] = useState("")
     const [modalVisible, setModalVisible] = useState(false);
     const [currentPerson, setCurrentPerson] = useState<SwapiPersonItem>();
+    const [currentPlanet, setCurrentPlanet] = useState<SwapiPlanetItem>();
+    const [currentMode, setCurrentMode] = useState("people");
+
+    const peopleUrl = "https://swapi.dev/api/people";
+    const planetsUrl = "https://swapi.dev/api/planets";
     
     useEffect(() => {
-        callApi("https://swapi.dev/api/people");
+        setIsLoading(true)
+        callApi(peopleUrl, setResponse);
     }, []);
 
-    const callApi = (url: string) => {
-        setIsLoading(true)
+    const callApi = (url: string, setter: React.Dispatch<React.SetStateAction<undefined>>) => {
         fetch(url)
         .then(res => res.json())
         .then(
           (result) => {
             setIsLoading(false);
-            setResponse(result);
+            setIsModalLoading(false);
+            setter(result);
           },
           (error) => {
             setIsLoading(false);
+            setIsModalLoading(false);
             setError(error);
           }
         )
@@ -36,21 +45,13 @@ const SwapiScreen = () => {
     
     useEffect(() => {
         if(response){
-            let people = response["results"];
+            let items = response["results"];
             let tempList = [...swapiList];
-            for (let person of [...people]){
+            for (let item of [...items]){
                 tempList = [...tempList, { 
                     id: uuid.v4(), 
-                    name: person["name"], 
-                    gender: person["gender"], 
-                    height: person["height"], 
-                    mass: person["mass"], 
-                    birth_year: person["birth_year"], 
-                    eye_color: person["eye_color"], 
-                    skin_color: person["skin_color"], 
-                    hair_color: person["hair_color"], 
-                    urlNext: person["next"], 
-                    urlPrevious: person["previous"]
+                    name: item["name"], 
+                    url: item["url"], 
                 }];
             }
             setSwapiList(tempList);
@@ -59,29 +60,81 @@ const SwapiScreen = () => {
         }
     }, [response]);
 
+    useEffect(() => {
+        if (itemResponse){
+            if(currentMode == "people"){
+                setCurrentPerson({
+                    name: itemResponse["name"],
+                    gender: itemResponse["gender"],
+                    height: itemResponse["height"],
+                    mass: itemResponse["mass"],
+                    birth_year: itemResponse["birth_year"],
+                    eye_color: itemResponse["eye_color"],
+                    skin_color: itemResponse["skin_color"],
+                    hair_color: itemResponse["hair_color"],
+                });
+            } else if (currentMode == "planets") {
+                setCurrentPlanet({
+                    name: itemResponse["name"],
+                    rotation_period: itemResponse["rotation_period"],
+                    orbital_period: itemResponse["orbital_period"],
+                    diameter: itemResponse["diameter"],
+                    climate: itemResponse["climate"],
+                    gravity: itemResponse["gravity"],
+                    terrain: itemResponse["terrain"],
+                    surface_water: itemResponse["surface_water"],
+                    population: itemResponse["population"]
+                })
+            }
+        }
+    }, [itemResponse]);
+
+    useEffect(() => {
+        setIsLoading(true);
+        if(currentMode == "people"){
+            setSwapiList([]);
+            callApi(peopleUrl, setResponse);
+        }
+        if(currentMode == "planets"){
+            setSwapiList([]);
+            callApi(planetsUrl, setResponse);
+        }
+    }, [currentMode]);
+
     const handleNext = () => {
+        setIsLoading(true)
         setSwapiList([]);
-        callApi(urlNext);
+        callApi(urlNext, setResponse);
     }
     const handlePrevious = () => {
+        setIsLoading(true)
         setSwapiList([]);
-        callApi(urlPrevious);
+        callApi(urlPrevious, setResponse);
     }
 
-    const handleDetails = (swapiItem: SwapiPersonItem) => {
-        setCurrentPerson(swapiItem);
+    const handleDetails = async (swapiItem: SwapiItem) => {
+        setIsModalLoading(true);
+        await callApi(swapiItem.url, setItemResponse)
         setModalVisible(true);
     }
 
-    const renderItem = (swapiItem: SwapiPersonItem) => 
+    const renderItem = (swapiItem: SwapiItem) => 
         <View style={styles.swapiItem}>
-            <Button title="details" onPress={() => handleDetails(swapiItem)}></Button>
+            <Button title="details" onPress={async () => await handleDetails(swapiItem)}></Button>
             <Text style={styles.swapiItemLabel}>{swapiItem.name}</Text>
         </View>
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>SWAPI</Text>
+            <View style={styles.buttons}>
+                {currentMode == "people" ? 
+                    <Button title="people" onPress={() => {setCurrentMode("people")}} disabled={true}></Button>
+                :   <Button title="people" onPress={() => {setCurrentMode("people")}}></Button>}
+                {currentMode == "planets" ? 
+                    <Button title="planets" onPress={() => {setCurrentMode("planets")}} disabled={true}></Button>
+                :   <Button title="planets" onPress={() => {setCurrentMode("planets")}}></Button>}
+            </View>
             <View style={styles.buttons}>
             {urlPrevious != null && !isLoading
                 ? <Button title="previous" onPress={() => handlePrevious()}></Button>
@@ -111,6 +164,8 @@ const SwapiScreen = () => {
                     }}>
                     <View style={styles.centeredView}>
                         <View style={styles.modalView}>
+                            {isModalLoading && <ActivityIndicator size={"large"}></ActivityIndicator>}
+                            {currentMode == "people" && !isModalLoading && <>
                             <Text style={styles.modalText}>Name: {currentPerson?.name}</Text>
                             <Text style={styles.modalText}>Gender: {currentPerson?.gender}</Text>
                             <Text style={styles.modalText}>height: {currentPerson?.height}</Text>
@@ -119,6 +174,18 @@ const SwapiScreen = () => {
                             <Text style={styles.modalText}>eye color: {currentPerson?.eye_color}</Text>
                             <Text style={styles.modalText}>skin color: {currentPerson?.skin_color}</Text>
                             <Text style={styles.modalText}>hair color: {currentPerson?.hair_color}</Text>
+                            </>}
+                            {currentMode == "planets" && !isModalLoading && <>
+                            <Text style={styles.modalText}>Name: {currentPlanet?.name}</Text>
+                            <Text style={styles.modalText}>rotation_period: {currentPlanet?.rotation_period}</Text>
+                            <Text style={styles.modalText}>orbital_period: {currentPlanet?.orbital_period}</Text>
+                            <Text style={styles.modalText}>diameter: {currentPlanet?.diameter}</Text>
+                            <Text style={styles.modalText}>climate: {currentPlanet?.climate}</Text>
+                            <Text style={styles.modalText}>gravity: {currentPlanet?.gravity}</Text>
+                            <Text style={styles.modalText}>terrain: {currentPlanet?.terrain}</Text>
+                            <Text style={styles.modalText}>surface_water: {currentPlanet?.surface_water}</Text>
+                            <Text style={styles.modalText}>population: {currentPlanet?.population}</Text>
+                            </>}
                             <Pressable
                                 style={[styles.button, styles.buttonClose]}
                                 onPress={() => setModalVisible(!modalVisible)}>
