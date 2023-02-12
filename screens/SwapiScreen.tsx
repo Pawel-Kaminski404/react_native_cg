@@ -74,10 +74,10 @@ const SwapiScreen = () => {
     }
 
     const renderItem = (swapiItem: SwapiPersonItem) => 
-    <View style={styles.swapiItem}>
-        <Button title="details" onPress={() => handleDetails(swapiItem)}></Button>
-        <Text style={styles.swapiItemLabel}>{swapiItem.name}</Text>
-    </View>
+        <View style={styles.swapiItem}>
+            <Button title="details" onPress={() => handleDetails(swapiItem)}></Button>
+            <Text style={styles.swapiItemLabel}>{swapiItem.name}</Text>
+        </View>
 
     return (
         <View style={styles.container}>
@@ -134,16 +134,15 @@ const SwapiScreen = () => {
 
 const styles = StyleSheet.create({
     container: {
-    padding: 10,
+        padding: 10,
     },
     title: {
-    fontSize: 40,
-    marginBottom: 40,
-    fontWeight: "bold",
-    textDecorationLine: "underline",
-    textAlign: "center",
-    paddingTop: 35
-
+        fontSize: 40,
+        marginBottom: 40,
+        fontWeight: "bold",
+        textDecorationLine: "underline",
+        textAlign: "center",
+        paddingTop: 35
     },
     buttons: {
         width: "100%",
@@ -152,45 +151,42 @@ const styles = StyleSheet.create({
         marginBottom: 20
     },
     centeredView: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginTop: 22,
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
     },
     modalView: {
-      margin: 20,
-      backgroundColor: 'white',
-      borderRadius: 20,
-      padding: 35,
-      alignItems: 'center',
-      shadowColor: '#000',
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 4,
-      elevation: 5,
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
     },
     button: {
-      borderRadius: 20,
-      padding: 10,
-      elevation: 2,
-    },
-    buttonOpen: {
-      backgroundColor: '#F194FF',
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2,
     },
     buttonClose: {
-      backgroundColor: '#2196F3',
+        backgroundColor: '#2196F3',
     },
     textStyle: {
-      color: 'white',
-      fontWeight: 'bold',
-      textAlign: 'center',
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
     modalText: {
-      marginBottom: 15,
-      textAlign: 'center',
+        marginBottom: 15,
+        textAlign: 'center',
     },
     swapiItem: {
         display: "flex",
