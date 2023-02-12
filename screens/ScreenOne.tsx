@@ -3,6 +3,7 @@ import { useState } from "react";
 import { StyleSheet, View, Text, TextInput, Button, FlatList } from "react-native"
 import ToDoListItem from "../components/ToDoListItem";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import uuid from 'react-native-uuid';
 
 
 
@@ -37,28 +38,23 @@ const getData = async () => {
     }
   }
 
-    const getNewIndex = (): number => {
-        var num = Math.floor(Math.random() * 100000);
-        setToDoListIndex(num);
-        return num;
-    }
 
     const addTask = (): void => {
         if (inputTextValue.trim()) {
-            setToDoList([...toDoList, { task: inputTextValue, done: false, id: getNewIndex() }]);
+            setToDoList([...toDoList, { task: inputTextValue, done: false, id: uuid.v4() }]);
             // storeData();
         }
         else setIsErrorVisible(true);
             setInputTextValue("");
       };
     
-    const removeItem = (index: number): void => {
+    const removeItem = (index: string | number[]): void => {
         const newToDoList = toDoList.filter(item => item.id != index)
         setToDoList(newToDoList);
         // storeData();
     };
 
-    const toggleDone = (index: number): void => {
+    const toggleDone = (index: string | number[]): void => {
         const newToDoList = [...toDoList];
         newToDoList.forEach(item => {
             if (item.id == index){

@@ -22,7 +22,7 @@ export default function ToDoListItem({ toDoItem, toggleComplete, removeItem, sty
                 { textDecorationLine: toDoItem.done ? "line-through" : "none" }
             ]}
             >
-            {toDoItem.task} -- My number is: {toDoItem.id}
+            {toDoItem.task}
             </Text>
             <Button
             title="X"

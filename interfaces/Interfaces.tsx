@@ -1,11 +1,11 @@
 interface ToDoItem {
-    id: number;
+    id: string | number[];
     task: string;
     done: boolean;
 }
 
 interface SwapiPersonItem {
-    id: number;
+    id: string | number[];
     name: string;
     gender: string;
     height: string;

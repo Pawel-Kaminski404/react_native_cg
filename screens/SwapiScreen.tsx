@@ -1,6 +1,8 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { View, Text, ActivityIndicator, FlatList, Button, Modal, Pressable, StyleSheet } from "react-native";
+import uuid from 'react-native-uuid';
+
 
 const SwapiScreen = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -32,18 +34,13 @@ const SwapiScreen = () => {
         )
     }
     
-    const getNewIndex = (): number => {
-        var num = Math.floor(Math.random() * 100000);
-        return num;
-    }
-
     useEffect(() => {
         if(response){
             let people = response["results"];
             let tempList = [...swapiList];
             for (let person of [...people]){
                 tempList = [...tempList, { 
-                    id: getNewIndex(), 
+                    id: uuid.v4(), 
                     name: person["name"], 
                     gender: person["gender"], 
                     height: person["height"], 
