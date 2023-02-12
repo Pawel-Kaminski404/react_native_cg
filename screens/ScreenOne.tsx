@@ -23,18 +23,6 @@ const WelcomeScreen = () => {
         }
       }
     
-    // const getData = async () => {
-    // try {
-    //     const value = await AsyncStorage.getItem('@storage_Key')
-    //     if(value !== null) {
-    //     // value previously stored
-    //         setToDoList(value);
-    //     }
-    // } catch(e) {
-    //     // error reading value
-    // }
-    // }
-
     
 const getData = async () => {
     try {
@@ -57,7 +45,7 @@ const getData = async () => {
     const addTask = (): void => {
         if (inputTextValue.trim()) {
             setToDoList([...toDoList, { task: inputTextValue, done: false, id: getNewIndex() }]);
-            // storeData();
+            storeData();
         }
         else setIsErrorVisible(true);
             setInputTextValue("");
@@ -100,7 +88,7 @@ const getData = async () => {
                 }}
                 style={styles.inputBox}
             />
-            <Button title="Add Task" onPress={addTask} />
+            <Button title="Add Task" onPress= {() => addTask()} />
             
             </View>
             {isErrorVisible && (
