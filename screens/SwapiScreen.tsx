@@ -83,14 +83,15 @@ const SwapiScreen = () => {
     </View>
 
     return (
-        <View>
-            <View>
+        <View style={styles.container}>
+            <Text style={styles.title}>SWAPI</Text>
+            <View style={styles.buttons}>
+            {urlPrevious != null && !isLoading
+                ? <Button title="previous" onPress={() => handlePrevious()}></Button>
+                : <Button disabled={true} title="previous" onPress={() => handlePrevious()}></Button>}
                 {urlNext != null && !isLoading
                 ? <Button  title="next" onPress={() => handleNext()}></Button>
                 : <Button disabled={true} title="next" onPress={() => handleNext()}></Button>}
-                {urlPrevious != null && !isLoading
-                ? <Button title="previous" onPress={() => handlePrevious()}></Button>
-                : <Button disabled={true} title="previous" onPress={() => handlePrevious()}></Button>}
             </View>
             <View>
                 {isLoading ? 
@@ -124,7 +125,7 @@ const SwapiScreen = () => {
                             <Pressable
                                 style={[styles.button, styles.buttonClose]}
                                 onPress={() => setModalVisible(!modalVisible)}>
-                                <Text style={styles.textStyle}>Hide Modal</Text>
+                                <Text style={styles.textStyle}>Hide</Text>
                             </Pressable>
                         </View>
                     </View>
@@ -135,6 +136,24 @@ const SwapiScreen = () => {
 };
 
 const styles = StyleSheet.create({
+    container: {
+    padding: 10,
+    },
+    title: {
+    fontSize: 40,
+    marginBottom: 40,
+    fontWeight: "bold",
+    textDecorationLine: "underline",
+    textAlign: "center",
+    paddingTop: 35
+
+    },
+    buttons: {
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 20
+    },
     centeredView: {
       flex: 1,
       justifyContent: 'center',

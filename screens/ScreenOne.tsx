@@ -25,6 +25,7 @@ const WelcomeScreen = () => {
     
     
 const getData = async () => {
+    setToDoList([]);
     try {
       const jsonValue = await AsyncStorage.getItem('@storage_Key')
       if (jsonValue != null) {
@@ -45,7 +46,7 @@ const getData = async () => {
     const addTask = (): void => {
         if (inputTextValue.trim()) {
             setToDoList([...toDoList, { task: inputTextValue, done: false, id: getNewIndex() }]);
-            storeData();
+            // storeData();
         }
         else setIsErrorVisible(true);
             setInputTextValue("");
@@ -54,7 +55,7 @@ const getData = async () => {
     const removeItem = (index: number): void => {
         const newToDoList = toDoList.filter(item => item.id != index)
         setToDoList(newToDoList);
-        storeData();
+        // storeData();
     };
 
     const toggleDone = (index: number): void => {
@@ -65,7 +66,7 @@ const getData = async () => {
             }
         })
         setToDoList(newToDoList);
-        storeData();
+        // storeData();
     };
 
     const renderItem = (toDoItem: ToDoItem) => <ToDoListItem 
@@ -92,14 +93,15 @@ const getData = async () => {
             
             </View>
             {isErrorVisible && (
-                <Text style={styles.error}>Error: Input field is empty...</Text>
+                <Text style={styles.error}>Input field cannot be empty.</Text>
             )}
+            <View style={styles.inputWrapper}>
+                <Button title="save" onPress={storeData} />
+                <Button title="load" onPress={getData} />
+            </View>
             <Text style={styles.subtitle}>Tasks:</Text>
             {toDoList.length === 0 && <Text>No tasks.</Text>}
             <View style={styles.toDoList}>
-            <Text>Data: {storedData}</Text>
-            <Button title="save" onPress={storeData} />
-            <Button title="read" onPress={getData} />
                 <FlatList 
                     ListHeaderComponent={<></>}
                     data={toDoList} renderItem= {({item}) => renderItem(item)}
@@ -123,8 +125,8 @@ const styles = StyleSheet.create({
     },
     inputBox: {
     width: 200,
-    borderColor: "purple",
-    borderRadius: 8,
+    borderColor: "#2196F3",
+    borderRadius: 4,
     borderWidth: 2,
     paddingLeft: 8
     },
@@ -137,7 +139,7 @@ const styles = StyleSheet.create({
     subtitle: {
     fontSize: 20,
     marginBottom: 20,
-    color: "purple"
+    color: "#2196F3"
     },
     listItem: {
     flexDirection: "row",
