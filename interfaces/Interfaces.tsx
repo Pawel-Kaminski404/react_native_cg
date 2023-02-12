@@ -8,5 +8,12 @@ interface SwapiPersonItem {
     id: number;
     name: string;
     gender: string;
-    url: string;
+    height: string;
+    mass: string;
+    birth_year: string;
+    eye_color: string;
+    skin_color: string;
+    hair_color: string;
+    urlNext: string;
+    urlPrevious: string;
 }

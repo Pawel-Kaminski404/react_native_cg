@@ -1,10 +1,6 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, FlatList, Button } from "react-native";
-
-
-
-
+import { View, Text, ActivityIndicator, FlatList, Button, Modal, Pressable, StyleSheet } from "react-native";
 
 const SwapiScreen = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -13,7 +9,8 @@ const SwapiScreen = () => {
     const [swapiList, setSwapiList] = useState<SwapiPersonItem[]>([]);
     const [urlNext, setUrlNext] = useState("")
     const [urlPrevious, setUrlPrevious] = useState("")
-
+    const [modalVisible, setModalVisible] = useState(false);
+    const [currentPerson, setCurrentPerson] = useState<SwapiPersonItem>();
     
     useEffect(() => {
         callApi("https://swapi.dev/api/people");
@@ -45,53 +42,56 @@ const SwapiScreen = () => {
             let people = response["results"];
             let tempList = [...swapiList];
             for (let person of [...people]){
-                tempList = [...tempList, { id: getNewIndex(), name: person["name"], gender: person["gender"], url: person["url"] }];
+                tempList = [...tempList, { 
+                    id: getNewIndex(), 
+                    name: person["name"], 
+                    gender: person["gender"], 
+                    height: person["height"], 
+                    mass: person["mass"], 
+                    birth_year: person["birth_year"], 
+                    eye_color: person["eye_color"], 
+                    skin_color: person["skin_color"], 
+                    hair_color: person["hair_color"], 
+                    urlNext: person["next"], 
+                    urlPrevious: person["previous"]
+                }];
             }
             setSwapiList(tempList);
             setUrlNext(response["next"]);
             setUrlPrevious(response["previous"]);
         }
     }, [response]);
-    
-    const getContent = () => {
-      if (isLoading) {
-        return <ActivityIndicator size="large" />;
-      }
-    
-      if (error) {
-        return <Text>{error}</Text>
-      }
-      
-      return <Text>Something went wrong.</Text>;
-    };
 
     const handleNext = () => {
         setSwapiList([]);
         callApi(urlNext);
-        console.log(urlNext)
     }
     const handlePrevious = () => {
         setSwapiList([]);
         callApi(urlPrevious);
-        console.log(urlPrevious)
+    }
+
+    const handleDetails = (swapiItem: SwapiPersonItem) => {
+        setCurrentPerson(swapiItem);
+        setModalVisible(true);
     }
 
     const renderItem = (swapiItem: SwapiPersonItem) => 
-    <View>
-        <Text>{swapiItem.name}</Text>
-        <Button title="details" onPress={() => console.log(swapiItem.url)}></Button>
+    <View style={styles.swapiItem}>
+        <Button title="details" onPress={() => handleDetails(swapiItem)}></Button>
+        <Text style={styles.swapiItemLabel}>{swapiItem.name}</Text>
     </View>
 
     return (
         <View>
-            {/* {getContent()} */}
-            {urlNext != null 
-            ? <Button title="next" onPress={() => handleNext()}></Button>
-            : <Button disabled={true} title="next" onPress={() => handleNext()}></Button>}
-            {urlPrevious != null 
-            ? <Button title="previous" onPress={() => handlePrevious()}></Button>
-            : <Button disabled={true} title="previous" onPress={() => handlePrevious()}></Button>}
-
+            <View>
+                {urlNext != null && !isLoading
+                ? <Button  title="next" onPress={() => handleNext()}></Button>
+                : <Button disabled={true} title="next" onPress={() => handleNext()}></Button>}
+                {urlPrevious != null && !isLoading
+                ? <Button title="previous" onPress={() => handlePrevious()}></Button>
+                : <Button disabled={true} title="previous" onPress={() => handlePrevious()}></Button>}
+            </View>
             <View>
                 {isLoading ? 
                     <ActivityIndicator size="large" />
@@ -103,8 +103,92 @@ const SwapiScreen = () => {
                     </FlatList>
                 }
             </View>
+            <View style={styles.centeredView}>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalVisible}
+                    onRequestClose={() => {
+                    setModalVisible(!modalVisible);
+                    }}>
+                    <View style={styles.centeredView}>
+                        <View style={styles.modalView}>
+                            <Text style={styles.modalText}>Name: {currentPerson?.name}</Text>
+                            <Text style={styles.modalText}>Gender: {currentPerson?.gender}</Text>
+                            <Text style={styles.modalText}>height: {currentPerson?.height}</Text>
+                            <Text style={styles.modalText}>mass: {currentPerson?.mass}</Text>
+                            <Text style={styles.modalText}>birth year: {currentPerson?.birth_year}</Text>
+                            <Text style={styles.modalText}>eye color: {currentPerson?.eye_color}</Text>
+                            <Text style={styles.modalText}>skin color: {currentPerson?.skin_color}</Text>
+                            <Text style={styles.modalText}>hair color: {currentPerson?.hair_color}</Text>
+                            <Pressable
+                                style={[styles.button, styles.buttonClose]}
+                                onPress={() => setModalVisible(!modalVisible)}>
+                                <Text style={styles.textStyle}>Hide Modal</Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </Modal>
+            </View>
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    centeredView: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: 22,
+    },
+    modalView: {
+      margin: 20,
+      backgroundColor: 'white',
+      borderRadius: 20,
+      padding: 35,
+      alignItems: 'center',
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5,
+    },
+    button: {
+      borderRadius: 20,
+      padding: 10,
+      elevation: 2,
+    },
+    buttonOpen: {
+      backgroundColor: '#F194FF',
+    },
+    buttonClose: {
+      backgroundColor: '#2196F3',
+    },
+    textStyle: {
+      color: 'white',
+      fontWeight: 'bold',
+      textAlign: 'center',
+    },
+    modalText: {
+      marginBottom: 15,
+      textAlign: 'center',
+    },
+    swapiItem: {
+        display: "flex",
+        flexDirection: "row-reverse",
+        flex: 1,
+        justifyContent: "space-between",
+        margin: 3
+    },
+    swapiItemLabel: {
+        textAlignVertical: "center",
+        flexGrow: 1,
+        textAlign: "center",
+        backgroundColor: "gainsboro"
+    }
+  });
 
 export default SwapiScreen
